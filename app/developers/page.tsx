@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+"use client";
+import { useEffect, useState } from "react"
 import { Suspense } from "react";
 import { DeveloperCard } from "./_component/DeveloperCard";
 import { LoadingCard } from "./_component/LoadingCard";
@@ -8,29 +8,10 @@ import GetDeveloperApi from "../api/DeveloperApi";
 import { Building2, Search } from "lucide-react";
 import Link from "next/link";
 
-export const metadata: Metadata = {
-  title: "Real Estate Developers | Strada Properties",
-  description:
-    "Discover top real estate developers partnered with Strada Properties. Explore their projects, compounds, and properties in prime locations.",
-  alternates: {
-    canonical: "/developers",
-  },
-  openGraph: {
-    title: "Real Estate Developers | Strada Properties",
-    description:
-      "Discover top real estate developers partnered with Strada Properties. Explore their projects, compounds, and properties in prime locations.",
-    url: "/developers",
-  },
-};
-async function getDevelopers() {
-  try {
-    const response = await GetDeveloperApi.getDeveloper();
-    return response.data.data;
-  } catch (error) {
-    console.error("Failed to fetch developers:", error);
-    notFound();
-  }
-}
+
+
+
+
 
 function LoadingState() {
   return (
@@ -42,9 +23,25 @@ function LoadingState() {
   );
 }
 
-export default async function DevelopersPage() {
-  const developers = await getDevelopers();
+export default  function DevelopersPage() {
+  const [developers, setDevelopers] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        setIsLoading(true)
+        const response = await GetDeveloperApi.getDeveloper()
+        setDevelopers(response.data.data)
+      } catch (error) {
+        console.error("Failed to fetch developers:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchDevelopers()
+  }, [])
   return (
     <main className="min-h-screen bg-[#F7F8F8]">
       <div className="bg-gradient-to-r from-[#013344] to-[#05596B] text-white py-28 relative overflow-hidden">
@@ -87,25 +84,28 @@ export default async function DevelopersPage() {
         </div>
 
         <Suspense fallback={<LoadingState />}>
-          {developers.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {developers.map((developer: any) => (
-                <DeveloperCard key={developer.slug} developer={developer} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-white rounded-lg shadow-md">
-              <div className="max-w-md mx-auto">
-                <h3 className="text-xl font-semibold text-[#013344] mb-2">
-                  No Developers Found
-                </h3>
-                <p className="text-[#05596B]">
-                  We couldn&apos;t find any developers matching your criteria.
-                  Please try adjusting your search.
-                </p>
+        {isLoading ? (
+          <LoadingState />
+        ) : (
+          <>
+            {developers.length > 0 ? (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {developers.map((developer : any) => (
+                  <DeveloperCard key={developer.slug} developer={developer} />
+                ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-12 bg-white rounded-lg shadow-md">
+                <div className="max-w-md mx-auto">
+                  <h3 className="text-xl font-semibold text-[#013344] mb-2">No Developers Found</h3>
+                  <p className="text-[#05596B]">
+                    We couldn&apos;t find any developers matching your criteria. Please try adjusting your search.
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
+        )}
         </Suspense>
       </div>
     </main>

@@ -1,20 +1,21 @@
 import axiosClient from "./axiosClient";
 
 const GetDeveloperApi = {
-  getDeveloper: () => axiosClient.get("/developers?populate=*"),
+  // getDeveloper: () => axiosClient.get("/developers?populate=*"),
+  getDeveloper: () => axiosClient.get(`/developers?populate=*&timestamp=${Date.now()}`),
 
-  getDeveloperBySlug: (slug: string) =>
-    axiosClient.get(
-      `/developers?` +
-        `filters[slug][$eq]=${slug}` +
-        `&populate[0]=logo` +
-        `&populate[1]=compounds` +
-        `&populate[2]=areas` +
-        `&populate[3]=compounds.offer.blocks` +
-        `&populate[4]=compounds.offer.compound` +
-        `&populate[5]=compounds.offer.developer` + // Add developer relation
-        `&populate[6]=compounds.properties`
-    ),
+  // getDeveloperBySlug: (slug: string) =>
+  //   axiosClient.get(
+  //     `/developers?` +
+  //       `filters[slug][$eq]=${slug}` +
+  //       `&populate[0]=logo` +
+  //       `&populate[1]=compounds` +
+  //       `&populate[2]=areas` +
+  //       `&populate[3]=compounds.offer.blocks` +
+  //       `&populate[4]=compounds.offer.compound` +
+  //       `&populate[5]=compounds.offer.developer` + // Add developer relation
+  //       `&populate[6]=compounds.properties`
+  //   ),
 
   getDevelopersWithNewLaunches: (slug: string) =>
     axiosClient.get(
@@ -78,6 +79,20 @@ const GetDeveloperApi = {
         `&populate[5]=properties` +
         `&populate[6]=area`
     ),
+
+    getDeveloperBySlug: (slug: string) =>
+      axiosClient.get(
+        `/developers?` +
+          `filters[slug][$eq]=${slug}` +
+          `&populate[0]=logo` +
+          `&populate[1]=compounds` +
+          `&populate[2]=areas` +
+          `&populate[3]=compounds.offer.blocks` +
+          `&populate[4]=compounds.offer.compound` +
+          `&populate[5]=compounds.offer.developer` + // Add developer relation
+          `&populate[6]=compounds.properties`,
+      ),
+
 };
 
 export default GetDeveloperApi;
